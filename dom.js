@@ -66,3 +66,69 @@ function filterItems(e) {
         }
     })
 }
+
+//day to
+
+class TypeWriter {
+    constructor(txtElement, words, waitTime = 3000) {
+        this.txtElement = txtElement;
+        this.words = words;
+        this.txt = '';
+        this.wordIndex = 0;  //index of the word
+        this.wait = parseInt(waitTime, 10);
+        this.isDeleting = false;
+
+    }
+    type(){
+        //get current index of the word
+        const currentWord = this.words[this.wordIndex] ;
+        
+        //check if deleting
+        if(this.isDeleting){
+            //Remove character
+            this.txt = currentWord.substring(0,this.txt.length - 1);
+
+        }else { 
+            //Add character
+            this.txt = currentWord.substring(0,this.txt.length + 1);
+
+        }
+        //insert into the txt 
+        this.txtElement.innerHTML = `<span class='txt'>${this.txt}<span/>`
+        
+        //type speed
+        let typeSpeed = 300;
+        if(this.isDeleting){typeSpeed /= 2;}
+        
+
+        //ifword is complete
+        if(!this.isDeleting && this.txt === currentWord){
+            typeSpeed = this.wait;
+            this.isDeleting = true;
+        } else if(this.isDeleting && this.txt ===''){
+            this.isDeleting = false;
+            //move to next work
+            this.wordIndex ++;
+            //pause before typing
+            typeSpeed = 500;
+
+        }
+
+        console.log(this.txt)
+        //console.log(currentWord)
+        setTimeout(()=>this.type(), 500);
+    };
+}
+
+//init the typeWriter when the dom loads
+document.addEventListener('DOMContentLoaded', Init);
+
+function Init(e){
+    const txtElement = document.querySelector('#header-title');
+    const words = JSON.parse(txtElement.lastChild.getAttribute("data-words"));
+    const wait  = txtElement.lastChild.getAttribute('data-wait');
+
+    //console.log(wait);
+    //init the typewriter
+    new TypeWriter(txtElement, words, wait).type();
+}
